@@ -2371,19 +2371,45 @@ FOR   N, 1, 12
 	BMI	T0		\ via detection delay lis
 NEXT
 
-	LDA	#0		\ if no start bit detected, reset CTS
-	STA	upiob
+\ If no start bit detected drop CTS but continue looking for start bit
+
+\ Using ASL is the faster way to drop CTS while continuing to sample
+\ The alternative, using LDA then STA, would take 2 extra cycles
+\ branching to T1 compensates for additional time compared to just LDA
+	ASL	upiob		\ (3 + 7)
+	BCS	T1		\ (2) or (3)
+	LDA	upiob		\ (3 + 3)
+	BMI	T1		\ (2) or (3)
+FOR   N, 1, 10
+	LDA	upiob		\ (3 + 3)
+	BMI	T0		\ (2) or (3)
+NEXT
+
 	TXA                     \ transfer buffer pointer to A
 	CLI			\ re-enable IRQ
 	RTS                     \ and return 
 
-.T0	CPX	#bufsize	\ to implement n byte buffer, CTS is
-	BCS	xcts		\ turned off after buf top is reached
-	LDA	#$40
-	BNE	wcts
-.xcts	LDA	#0
-	NOP
-.wcts	STA	upiob           \ maintains or drops CTS
+\ To implement n byte buffer, CTS is
+\ turned off after buf top is reached
+
+\ This section is exactly 15 cycles, like the original code,
+\ but only ever drops CTS.
+
+.T0	CPX	#bufsize	\ (2)  (2)
+	BCS	xcts		\ (2)  (3)
+.T1	NOP			\ (2)
+	NOP			\ (2)
+	NOP			\ (2)
+	LDA	#0		\ (2)
+	BEQ	xskip		\ (3)
+.xcts
+	NOP			\      (2)
+	LDA	#0		\      (2)
+	STA	upiob           \      (4 + 2)
+.xskip				\ (15) (15)
+
+\ I think the comment about Y must start at 0 is incorrect
+\ because 8 bits are always shifted in
 
                                 \ sequential bit reads, Y must start at 0
 	LDA	upiob           \ bit 0
