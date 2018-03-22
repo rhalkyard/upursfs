@@ -2483,12 +2483,17 @@ NEXT
 	LDA	sbuft		\ any bytes waiting in serial buffer?
 	BNE	gb2		\ yes, continue
 	JSR	getbytes	\ else attempt to fill serial buffer
-	BNE	gb1		\ if bytes returned continue
-	JSR	wait		\ else allow Tx to resume in case paused
+
+; This delay has a big impact on SAVE performance, so lets be
+; brave and get rid of it. Expect lots to break!
+;
+;	BNE	gb1		\ if bytes returned continue
+;	JSR	wait		\ else allow Tx to resume in case paused
 ;	JSR	wait
 ;	JSR	wait
 ;	JSR	wait
-	JSR	getbytes	\ second attempt to fill buffer
+;	JSR	getbytes	\ second attempt to fill buffer
+
 	BEQ	nodata		\ no bytes, assume Tx EOF occurred, exit
 .gb1	LDA	#(LO(serbuf))+1	\ after serial buffer fill, set pointers
 	STA	sbufl
