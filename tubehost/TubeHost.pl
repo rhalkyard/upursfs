@@ -69,6 +69,7 @@ use FileHandle;
 use Socket;
 use POSIX qw( TCIFLUSH );
 use IO::Socket::UNIX qw( SOCK_STREAM );
+use Errno qw( EAGAIN );
 
 my $FILE_LOCKED=8;
 my $FILE_UNLOCKED=0;
@@ -310,8 +311,10 @@ sub raw_write($)
 
   if ($SERIAL)
   {
-    $socket->write($b);
-    $socket->write_drain;
+    while (!defined($socket->write($b)) && $! == EAGAIN) {
+      select(undef,undef,undef,1/1000);      
+    }
+#    $socket->write_drain;
   }
   else
   {
