@@ -25,7 +25,6 @@
 #                      Allow disk names with a number prefix to be called
 #                      without the number
 # v0.09 - 2013/09/22 - Move IAM later down the list so *I. calls INFO
-
 my $VERSION="0.09";
 
 my $SERIAL=1;
@@ -35,7 +34,7 @@ my $BAUD=9600;
 my $PAUSE_AFTER=1;
 my $PAUSE_DELAY=2;
 my $DEBUG=$ENV{DEBUG} || 0;
-my $disk_base="/home/sweh/Beeb_Disks";
+my $disk_base=$ENV{HOME} . "/Beeb_Disks";
 my $identity="Anonymous";
 
 my @ORIG_ARGV=@ARGV;
