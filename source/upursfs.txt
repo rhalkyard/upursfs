@@ -9,6 +9,10 @@ DEFAULT_FS = FALSE
 \ http://sweh.spuddy.org/Beeb/2nd_User_Port/
 USER_PORT = &FE60
 
+\ Set to TRUE if user port is accessed at 2MHz (e.g for Econet-slot user ports
+\ such as https://github.com/rhalkyard/econet-upurs)
+USER_PORT_2MHZ = FALSE
+
 BreakKey = &35  \ U
 
 include "compile_date"
@@ -22,10 +26,19 @@ MACRO	VERSION_STRING
 	ENDIF
 ENDMACRO
 MACRO	VERSION_DATE
-	EQUS "23 Mar 2018"
+	EQUS "13 Mar 2023"
 ENDMACRO
 MACRO	VERSION_NAME
 	EQUS "HostFS:UPURS"
+ENDMACRO
+MACRO	DELAY_UP2MHZ
+	IF USER_PORT_2MHZ
+\ LDA and STA accesses to 1MHz Bus peripherals (e.g. the user VIA or most extra
+\ user port addons) take 6 cycles (3 microseconds) due to cycle-stretching.
+\ 2MHz accesses take 4 cycles (2 microseconds). For timing-critical sections,
+\ insert a NOP to keep timing consistent.
+	NOP
+	ENDIF
 ENDMACRO
 
 \ These values are for the User Port

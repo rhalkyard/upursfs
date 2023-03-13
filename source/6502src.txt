@@ -2293,14 +2293,16 @@ IF	UPURS
         TAX                     \ (2)   Start bit (9 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         TXA                     \ (2)
         ROR     A               \ (2)
         TAX                     \ (2)   Bit 0 (8 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         NOP                     \ (2)
         TXA                     \ (2)
@@ -2308,7 +2310,8 @@ IF	UPURS
         TAX                     \ (2)   Bit 1 (9 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         NOP                     \ (2)
         TXA                     \ (2)
@@ -2316,14 +2319,16 @@ IF	UPURS
         TAX                     \ (2)   Bit 2 (9 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         TXA                     \ (2)
         ROR     A               \ (2)
         TAX                     \ (2)   Bit 3 (8 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         NOP                     \ (2)
         TXA                     \ (2)
@@ -2331,7 +2336,8 @@ IF	UPURS
         TAX                     \ (2)   Bit 4 (9 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         NOP                     \ (2)
         TXA                     \ (2)
@@ -2339,14 +2345,16 @@ IF	UPURS
         TAX                     \ (2)   Bit 5 (9 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         TXA                     \ (2)
         ROR     A               \ (2)
         TAX                     \ (2)   Bit 6 (8 us)
         LDA     #0              \ (2)
         ADC     #0              \ (2)
-        STA     upiob           \ (6)
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA)
 
         NOP                     \ (2)
         NOP                     \ (2)
@@ -2354,7 +2362,8 @@ IF	UPURS
         NOP                     \ (2)
         NOP                     \ (2)
         LDA     #0              \ (2) 
-        STA     upiob           \ (6) Stop bit
+        DELAY_UP2MHZ            \ (2) delay for 2MHz VIA only
+        STA     upiob           \ (6) (4 for 2MHz VIA) Stop bit
 
         CLI
         PLA                     \ Restore X                     
@@ -2425,6 +2434,9 @@ NEXT
 \ branching to T1/T2 compensates for additional cycles already consumed
 \ interleaving the ASL/BCS and LDA/BMI reduces the worst case sampling
 \ interval from 6us to 5us. (i.e. 4,6,4,4 becomes 4,5,5,4)
+\
+\ this section benefits from begin as fast as possible, not adding any
+\ 2MHz NOPs here - rhalkyard
 	ASL	upiob		\ (3 + 7)
 	LDA	upiob		\ (3 + 3)
 	BCS	T2		\ (2) or (3)
@@ -2456,6 +2468,7 @@ NEXT
 .xcts
 	NOP			\      (2)
 	LDA	#0		\      (2)
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	STA	upiob           \      (4 + 2)
 .xskip				\ (15) (15)
 
@@ -2463,6 +2476,7 @@ NEXT
 \ because 8 bits are always shifted in
 
                                 \ sequential bit reads, Y must start at 0
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob           \ bit 0
 	ASL A
 	TYA
@@ -2471,6 +2485,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 1
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
@@ -2479,6 +2494,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 2
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
@@ -2486,6 +2502,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 3
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
@@ -2494,6 +2511,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 4
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
@@ -2501,6 +2519,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 5
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
@@ -2509,6 +2528,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 6
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
@@ -2516,6 +2536,7 @@ NEXT
 	NOP
 
 	TAY			\ bit 7
+	DELAY_UP2MHZ		\ 2-cycle Delay for 2MHZ VIA
 	LDA	upiob
 	ASL A
 	TYA
